@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title><%= Name %></title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.js"></script>
+</head>
+<body>
+	<div class="jumbotron text-center">
+		<h1>
+			<a href=<%= '//'+link %> style="text-decoration: none;">
+				<%= Name %>
+			</a>
+		</h1>
+		<div class="row">
+			<div class="text-center" style="margin-top: 1em;">
+				<a href="/" class="btn btn-info btn-large">
+					<i class="fa fa-cog">
+						Create New Pull
+					</i>
+				</a>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="col-sm-10 cols-sm-offset-2">
+			<div class="row">
+				<div class="col-sm-6">
+					<h2 style="margin-bottom: 1em"><%= Name %></h2>
+					<form action="/pull/update" method="post">
+						<div class="form-group">
+							<input type="hidden" value=<%= id %> name="id">
+							<label for="vote" style="margin-bottom: 2em;"><b>I would like to vote for ....</b></label>
+							<select name="vote" class="form-control">
+								var data = <%- JSON.stringify(data) %>
+								<option value="blah" selected="selected">
+									Choose Now!
+								</option>
+								<% for(var i=0;i<data.length;i++) {%>
+									<option value=<%=i%>><%= data[i].name %></option>
+								<% } %>
+							</select>
+						</div>
+						<div class="form-group">
+							<input type="submit" value="Vote Now !" class="btn btn-primary btn-block">
+						</div>
+					</form>
+					<h2 style="margin:1em 0;">Pull Link</h2>
+					<input type="text" value=<%= link %> class="form-control">
+				</div>
+				<div class="col-sm-6" id="barChart">
+					<canvas width="500" height="500" id="myBarCart"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+	 	var data = <%- JSON.stringify(data) %>
+	 	var label = [];
+	 	var value = [];
+	 	var backgroundColor = [];
+	 	var borderColor = [];
+	 	data.forEach(function(element){
+	 		console.log(element.name,element.value);
+	 		label.push(element.name);
+	 		value.push(element.value);
+	 		backgroundColor.push(randomColorCodeGenerator());
+	 		borderColor.push(randomColorCodeGenerator());
+	 	});
+
+	 	console.log(backgroundColor);
+
+	 	function randomColorCodeGenerator(){
+	 		var red = randomNum(255);
+	 		var green = randomNum(255);
+	 		var blue = randomNum(255);
+	 		return 'rgba('+red+','+green+','+blue+','+0.2+')';
+	 	}
+
+	 	function randomNum(num){
+	 		return Math.floor(Math.random()*num);
+	 	}
+
+	 	var myBarChart = new Chart(document.getElementById('myBarCart').getContext("2d"),{
+	 		type:'pie',
+	 		data: {
+	 			labels: label,
+	 			datasets: [{
+	 				label:" of Votes",
+	 				data: value,
+	 				backgroundColor: backgroundColor,
+	 				borderColor: borderColor,
+	 				borderWidth: 1,
+	 			}]
+	 		}
+	 	})
+	</script>
+</body>
+</html>

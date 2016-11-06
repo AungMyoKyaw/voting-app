@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Voting App</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+</head>
+<body>
+	<div class="jumbotron text-center">
+		<h1><a href="./" style="text-decoration: none;">Voting App</a></h1>
+		<small style="display: block">Signin With:</small>
+		<a href="./auth/twitter" class="btn btn-primary"><i class="fa fa-twitter"></i>Twitter</a>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-12">
+				<h2 class="text-info" style="border-left: .2em solid blue;padding-left: .5em;margin-bottom: 1em;">Recent Polls</h2>
+			</div>
+		</div>
+		<div class="row">
+			<% for(var i=0;i<recent.length;i++){ %>
+				<div class="col-sm-4 well text-center">
+					<a href=<%= '/pull/'+recent[i].id %>>
+						<h3><%=recent[i].Name%></h3>
+					</a>
+				</div>
+			<% } %>
+		</div>
+	</div>
+</body>
+</html>

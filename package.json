@@ -1,0 +1,23 @@
+{
+  "name": "voting_app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "~1.0.0",
+    "cookie-parser": "~1.0.0",
+    "ejs": "^2.5.2",
+    "express": "^4.14.0",
+    "express-session": "~1.0.0",
+    "mongoose": "^4.6.4",
+    "passport": "^0.3.2",
+    "passport-twitter": "^1.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

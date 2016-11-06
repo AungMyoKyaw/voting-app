@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title><%= userName %></title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+</head>
+<body>
+	<div class="jumbotron text-center">
+		<h1><a href="./" style="text-decoration: none;"><%= userName %></a></h1>
+		<a href="logout" class="btn btn-default">
+			<i class="fa fa-sign-out"></i>
+			Logout
+		</a>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="text-center">
+				<a href="/new" class="btn btn-info btn-lg">
+					<i class="fa fa-cog"></i>
+					Create New Pull
+				</a>
+			</div>
+		</div>
+		<div class="row">
+			<div class="row">
+				<div class="text-info">
+					<h2 style="border-left: .2em solid blue;padding-left: .3em;margin-bottom: 1em;">My Recent Pulls</h2>
+				</div>
+			</div>
+			<div class="row">
+				<% for(var i=0;i<recentPull.length;i++){ %>
+					<div class="col-sm-4 well text-center text-info">
+					 	<a href=<%= '/pull/'+recentPull[i].id %> style="text-decoration: none;">
+					 		<h3><%= recentPull[i].Name %></h3>
+					 	</a>
+					</div>
+				<% } %>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
