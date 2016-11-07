@@ -49,7 +49,7 @@
 						</div>
 					</form>
 					<h2 style="margin:1em 0;">Pull Link</h2>
-					<input type="text" value=<%= link %> class="form-control">
+					<input type="text" value=<%= link %> class="form-control" readonly id="pullLink">
 				</div>
 				<div class="col-sm-6" id="barChart">
 					<canvas width="500" height="500" id="myBarCart"></canvas>
@@ -96,7 +96,7 @@
 	 				borderWidth: 1,
 	 			}]
 	 		}
-	 	})
+	 	});
 	</script>
 </body>
 </html>
