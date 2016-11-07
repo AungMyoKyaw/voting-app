@@ -8,6 +8,7 @@ var passport = require('passport');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var compression = require('compression');
 
 mongoose.connect(dbUrl);
 app.set('view engine','ejs');
@@ -16,6 +17,7 @@ app.use(bodyParser());
 app.use(session({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(compression());
 
 require('./config/passport.js')(passport);
 routes(app,passport);
