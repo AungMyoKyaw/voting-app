@@ -1,7 +1,7 @@
 module.exports = {
-	'twitterAuth' : {
-		'consumerKey' : 'GdyYiyZZ2Fzmq85bjIzw84YBd',
-		'consumerSecret' : 'fyuPEv8kGfIm3FdybAKYJQLDMkevXr2BUyhEkhKlrnw7SQQz3G',
-		'callbackURL' : 'https://fcc-voting-app-amk.herokuapp.com/auth/twitter/callback'
-	}
-}
+  twitterAuth: {
+    consumerKey: process.env.TWITTER_CONSUMER_KEY,
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+    callbackURL: process.env.TWITTER_CALLBACK_URL || 'http://localhost:3000/auth/twitter/callback'
+  }
+};
