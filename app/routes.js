@@ -1,145 +1,165 @@
-module.exports = function(app,passport){
-	app.get('/',function(req,res,next){
-		if(req.isAuthenticated()){
-			res.redirect('/profile');
-		} else {
-			var pullList = require('./models/pull.js');
-			pullList.find({}).sort({_id:-1}).limit(6).exec(function(err,data){
-				if(err){
-					res.redirect('/');
-				} else {
-					console.log(data);
-					res.render('index.ejs',{
-						recent: data
-					});
-				}
-			});
-		}
-	});
+var pullList = require('./models/pull.js');
 
-	app.get('/auth/twitter',passport.authenticate('twitter'));
+module.exports = function(app, passport) {
+  // Home page
+  app.get('/', async function(req, res, next) {
+    if (req.isAuthenticated()) {
+      return res.redirect('/profile');
+    }
 
-	app.get('/auth/twitter/callback',passport.authenticate('twitter',{
-		successRedirect: '/profile',
-		failureRedirect: '/'
-	}));
+    try {
+      var data = await pullList.find({}).sort({ _id: -1 }).limit(6);
+      res.render('index.ejs', { recent: data });
+    } catch (err) {
+      console.error('Error fetching polls:', err.message);
+      res.render('index.ejs', { recent: [], error: 'Failed to load recent polls' });
+    }
+  });
 
-	app.get('/profile',function(req,res){
-		if(req.isAuthenticated()){
-			var pullList = require('./models/pull.js');
-			pullList.find({createdBy:req.user.twitter.id}).sort({_id:-1}).exec(function(err,data){
-				if(err){
-					res.redirect('/');
-				} else {
-					res.render('profile.ejs',{
-						userName: req.user.twitter.displayName,
-						recentPull: data
-					});	
-				}
-			});	
-		} else {
-			res.redirect('/');
-		}
-		
-	});
-	
-	app.get('/logout',function(req,res){
-		req.logout();
-		res.redirect('/');
-	});
+  // Twitter authentication
+  app.get('/auth/twitter', passport.authenticate('twitter'));
 
-	app.get('/new',function(req,res){
-		if(req.isAuthenticated()){
-			res.render('newPull.ejs',{
-				userName : req.user.twitter.displayName,
-			});
-			// console.log(req.user.twitter);
-		} else {
-			res.redirect('/');
-		}
-	});
+  app.get('/auth/twitter/callback', passport.authenticate('twitter', {
+    successRedirect: '/profile',
+    failureRedirect: '/'
+  }));
 
-	app.post('/new',function(req,res){
-		if(req.isAuthenticated() && req.body.Name){
-			// console.log(req.body.Name);
-			var optionList = req.body.optionList.split('\r\n');
-			var optionListAndResult = [];
-			optionList.forEach(function(element,index){
-				if(element!==""){
-					var toput = {
-						name: element,
-						value: 0
-					}
-					optionListAndResult.push(toput);
-				}
-			});
-			var pullList = require('./models/pull.js');
-			newPullList = new pullList();
-			newPullList.Name = req.body.Name;
-			newPullList.createdBy = req.user.twitter.id;
-			// console.log(optionListAndResult);
-			newPullList.optionListAndResult = optionListAndResult;
-			newPullList.save(function(err){
-				if(err){
-					throw err;
-				} else {
-					// console.log(newPullList.id,'//////////////////');
-					res.redirect('/pull/'+newPullList.id);
-					// return done(null,newPullList);
-				}
-			});
-		} else {
-			res.redirect('/');
-		}
-	});
+  // Profile page (requires authentication)
+  app.get('/profile', async function(req, res) {
+    if (!req.isAuthenticated()) {
+      return res.redirect('/');
+    }
 
-	app.get('/pull/:pullid',function(req,res){
-		var pullList = require('./models/pull.js');
-		pullList.findOne({_id:req.params.pullid},function(err,data){
-			if(err){
-				res.end(err);
-			} else {
-				// res.json(data);
-				// res.json(data.optionListAndResult)
-				// console.log(req.hostname,req.originalUrl)
-				res.render('pullDisplay.ejs',{
-					Name: data.Name,
-					data: data.optionListAndResult,
-					id: req.params.pullid,
-					link: req.get('host')+req.originalUrl
-				});
-			}
-		})
-	});
+    try {
+      var data = await pullList.find({ createdBy: req.user.twitter.id }).sort({ _id: -1 });
+      res.render('profile.ejs', {
+        userName: req.user.twitter.displayName,
+        recentPull: data
+      });
+    } catch (err) {
+      console.error('Error fetching user polls:', err.message);
+      res.render('profile.ejs', {
+        userName: req.user.twitter.displayName,
+        recentPull: [],
+        error: 'Failed to load your polls'
+      });
+    }
+  });
 
-	app.post('/pull/update',function(req,res){
-		if(req.body.id && req.body.optionListAndResult!=="blah"){
-			var pullList = require('./models/pull.js');
-			pullList.findById(req.body.id,function(err,data){
-				if(err){
-					res.redirect('/');
-				} else {
-					var result = data.optionListAndResult;
-					result[req.body.vote].value+=1;
-					data.optionListAndResult = result;
-					data.save(function(err){
-						if(err){
-							res.redirect('/');
-						} else {
-							res.redirect('/pull/'+req.body.id);
-							// console.log('Successfully Updated');
-						}
-					})
-					// console.log(result[req.body.vote]);
-					// console.log(req.body,result[req.body.vote]);
-					// res.json(result[req.body.vote]);
-				}
-			})
-			// res.json(req.body);
-		} else {
-			res.end(':)');
-		}
-		// res.json(req.body);
-	});
+  // Logout
+  app.get('/logout', function(req, res) {
+    req.logout(function(err) {
+      if (err) {
+        console.error('Logout error:', err.message);
+      }
+      res.redirect('/');
+    });
+  });
 
-}
+  // New poll page (requires authentication)
+  app.get('/new', function(req, res) {
+    if (!req.isAuthenticated()) {
+      return res.redirect('/');
+    }
+    res.render('newPull.ejs', {
+      userName: req.user.twitter.displayName
+    });
+  });
+
+  // Create new poll (requires authentication)
+  app.post('/new', async function(req, res) {
+    if (!req.isAuthenticated()) {
+      return res.redirect('/');
+    }
+
+    if (!req.body.Name || !req.body.optionList) {
+      return res.render('newPull.ejs', {
+        userName: req.user.twitter.displayName,
+        error: 'Poll name and options are required'
+      });
+    }
+
+    var optionList = req.body.optionList.split('\r\n');
+    var optionListAndResult = [];
+
+    optionList.forEach(function(element) {
+      if (element.trim() !== '') {
+        optionListAndResult.push({
+          name: element.trim(),
+          value: 0
+        });
+      }
+    });
+
+    if (optionListAndResult.length < 2) {
+      return res.render('newPull.ejs', {
+        userName: req.user.twitter.displayName,
+        error: 'Please provide at least 2 options'
+      });
+    }
+
+    var newPullList = new pullList();
+    newPullList.Name = req.body.Name.trim();
+    newPullList.createdBy = req.user.twitter.id;
+    newPullList.optionListAndResult = optionListAndResult;
+
+    try {
+      await newPullList.save();
+      res.redirect('/pull/' + newPullList.id);
+    } catch (err) {
+      console.error('Error saving poll:', err.message);
+      res.render('newPull.ejs', {
+        userName: req.user.twitter.displayName,
+        error: 'Failed to create poll. Please try again.'
+      });
+    }
+  });
+
+  // View poll
+  app.get('/pull/:pullid', async function(req, res) {
+    try {
+      var data = await pullList.findOne({ _id: req.params.pullid });
+      if (!data) {
+        return res.status(404).render('error.ejs', { message: 'Poll not found' });
+      }
+      res.render('pullDisplay.ejs', {
+        Name: data.Name,
+        data: data.optionListAndResult,
+        id: req.params.pullid,
+        link: req.get('host') + req.originalUrl
+      });
+    } catch (err) {
+      res.status(404).render('error.ejs', { message: 'Poll not found' });
+    }
+  });
+
+  // Vote on poll
+  app.post('/pull/update', async function(req, res) {
+    if (!req.body.id || req.body.optionListAndResult === 'blah') {
+      return res.status(400).send('Invalid request');
+    }
+
+    var voteIndex = parseInt(req.body.vote, 10);
+    if (isNaN(voteIndex)) {
+      return res.status(400).send('Invalid vote');
+    }
+
+    try {
+      var data = await pullList.findById(req.body.id);
+      if (!data) {
+        return res.redirect('/');
+      }
+
+      if (voteIndex < 0 || voteIndex >= data.optionListAndResult.length) {
+        return res.status(400).send('Invalid vote option');
+      }
+
+      data.optionListAndResult[voteIndex].value += 1;
+      await data.save();
+      res.redirect('/pull/' + req.body.id);
+    } catch (err) {
+      console.error('Error saving vote:', err.message);
+      res.redirect('/');
+    }
+  });
+};

@@ -1,24 +1,35 @@
 {
   "name": "voting_app",
   "version": "1.0.0",
-  "description": "",
+  "description": "A voting application with Twitter authentication",
   "main": "server.js",
+  "keywords": [
+    "voting",
+    "poll",
+    "express",
+    "mongodb",
+    "twitter-oauth"
+  ],
   "dependencies": {
-    "body-parser": "~1.0.0",
-    "compression": "^1.6.2",
-    "cookie-parser": "~1.0.0",
-    "ejs": "^2.5.2",
-    "express": "^4.14.0",
-    "express-session": "~1.0.0",
-    "mongoose": "^4.6.4",
-    "passport": "^0.3.2",
+    "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongoose": "^8.1.1",
+    "passport": "^0.7.0",
     "passport-twitter": "^1.0.4"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }
